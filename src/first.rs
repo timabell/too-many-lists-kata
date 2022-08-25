@@ -4,7 +4,7 @@ pub struct List {
 }
 struct Node {
     elem: i32,
-    next: List,
+    next: Link,
 }
 enum Link {
     Empty,
