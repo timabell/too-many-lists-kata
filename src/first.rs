@@ -29,10 +29,16 @@ impl List {
         self.head = Link::More(new_node);
     }
     pub fn pop(&mut self) -> Option<i32> {
+        let result;
         match &self.head {
-            Link::Empty => {}
-            Link::More(node)=> {}
+            Link::Empty => {
+                result = None;
+            }
+            Link::More(node)=> {
+                result = Some(node.elem);
+                self.head = node.next;
+            }
         }
-        unimplemented!()
+        result
     }
 }
