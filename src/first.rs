@@ -30,7 +30,7 @@ impl List {
     }
     pub fn pop(&mut self) -> Option<i32> {
         let result;
-        match &self.head {
+        match mem::replace(&mut self.head, Link::Empty) {
             Link::Empty => {
                 result = None;
             }
