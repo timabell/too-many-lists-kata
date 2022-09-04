@@ -40,6 +40,7 @@ impl List {
 }
 
 mod tests {
+    use super::List;
     #[test]
     fn basics() {
         let mut list = List::new();
