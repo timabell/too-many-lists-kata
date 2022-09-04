@@ -38,3 +38,11 @@ impl List {
         }
     }
 }
+
+mod tests {
+    #[test]
+    fn basics() {
+        let mut list = List::new();
+        assert_eq!(list.pop(), None);
+    }
+}
