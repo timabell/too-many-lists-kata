@@ -4,34 +4,39 @@ use std::mem;
 pub struct List {
     head: Link,
 }
+
+type Link = Option<Box<Node>>;
+
 struct Node {
     elem: i32,
     next: Link,
 }
-enum Link {
-    Empty,
-    More(Box<Node>),
-}
+
+// diy Option, replaced with type alias Link above
+// enum Link {
+//     None,
+//     Some(Box<Node>),
+// }
 
 ////////////
 
 impl List {
     fn new() -> Self {
-        List { head: Link::Empty }
+        List { head: None }
     }
     // before: LIST^1 -> head^1 -> link^1 -> more<box<node^1>> -> node^1 -> elem^1 + next^1 -> list^2 -> head^2 ...
     // after:  LIST^1 -> head^1 -> link^1 -> more<box<node^3>> -> node^3 -> elem^3 + next^3 -> list^1 -> head^1 -> link^1 -> more<box<node^1>> ...
     fn push(&mut self, elem: i32) {
         let new_node = Box::new(Node {
             elem,
-            next: mem::replace(&mut self.head, Link::Empty),
+            next: mem::replace(&mut self.head, None),
         });
-        self.head = Link::More(new_node);
+        self.head = Some(new_node);
     }
     pub fn pop(&mut self) -> Option<i32> {
-        match mem::replace(&mut self.head, Link::Empty) {
-            Link::Empty => None,
-            Link::More(node) => {
+        match mem::replace(&mut self.head, None) {
+            None => None,
+            Some(node) => {
                 self.head = node.next;
                 Some(node.elem)
             }
