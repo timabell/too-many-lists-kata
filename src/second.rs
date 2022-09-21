@@ -44,6 +44,15 @@ impl List {
     }
 }
 
+impl Drop for List {
+    fn drop(&mut self) {
+        let mut cur_link = mem::replace(&mut self.head, None);
+        while let Some(mut boxed_node) = cur_link {
+            cur_link = mem::replace(&mut boxed_node.next, None);
+        }
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::List;
