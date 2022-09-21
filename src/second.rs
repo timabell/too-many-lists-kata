@@ -4,14 +4,19 @@ use std::mem;
 pub struct List {
     head: Link,
 }
+
+type Link = Option<Box<Node>>;
+
 struct Node {
     elem: i32,
     next: Link,
 }
-enum Link {
-    None,
-    Some(Box<Node>),
-}
+
+// diy Option, replaced with type alias Link above
+// enum Link {
+//     None,
+//     Some(Box<Node>),
+// }
 
 ////////////
 
