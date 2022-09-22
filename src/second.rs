@@ -54,9 +54,14 @@ impl List {
 // We've implemented drop because the default de-allocation of a list would be recursive which could stackoverflow.
 impl Drop for List {
     fn drop(&mut self) {
+        // Steal value of head and replace it with None, giving us an owned reference to it in cur_link (which we'll then repeatedly overwrite as we loop).
         let mut cur_link = mem::replace(&mut self.head, None);
+        // `while let` is clever pattern matching voodoo,
+        // it's attempting to assign cur_link to pattern Some(boxed_node), which will set boxed_node if it works, otherwise the while will exit
         while let Some(mut boxed_node) = cur_link {
+            // As above, steal the `next` link without leaving next uninitialized.
             cur_link = mem::replace(&mut boxed_node.next, None);
+            // no need to actually drop inner things (boxed_nde) as they just go out of scope now as nothing else owns them so rust compiler can free them automatically
         }
     }
 }
