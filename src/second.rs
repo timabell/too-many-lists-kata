@@ -49,7 +49,9 @@ impl List {
     }
 }
 
-// I wasn't paying attention to this bit, todo: go back and read the docs
+// This is how destructors are done in rust, by implementing the Drop trait.
+// https://rust-unofficial.github.io/too-many-lists/first-drop.html
+// We've implemented drop because the default de-allocation of a list would be recursive which could stackoverflow.
 impl Drop for List {
     fn drop(&mut self) {
         let mut cur_link = mem::replace(&mut self.head, None);
