@@ -1,9 +1,10 @@
 use std::mem;
 
+// DIY singly list list https://rust-unofficial.github.io/too-many-lists/
+// Test at end of file.
+
+// Contents of a list looks like this, which can go on forever:
 //  list -> head -> link -> option<box<node>> -> node -> elem+list -> head ...
-pub struct List {
-    head: Link,
-}
 
 type Link = Option<Box<Node>>;
 
@@ -12,30 +13,34 @@ struct Node {
     next: Link,
 }
 
-// diy Option, replaced with type alias Link above
-// enum Link {
-//     None,
-//     Some(Box<Node>),
-// }
-
-////////////
+pub struct List {
+    head: Link,
+}
 
 impl List {
     fn new() -> Self {
         List { head: None }
     }
+
+    // Add element to the front of the list
     // before: LIST^1 -> head^1 -> link^1 -> some<box<node^1>> -> node^1 -> elem^1 + next^1 -> list^2 -> head^2 ...
     // after:  LIST^1 -> head^1 -> link^1 -> some<box<node^3>> -> node^3 -> elem^3 + next^3 -> list^1 -> head^1 -> link^1 -> some<box<node^1>> ...
     fn push(&mut self, elem: i32) {
+        // Make node from supplied element value.
         let new_node = Box::new(Node {
             elem,
+            // "next" for the new node has to become the same Link as the one currently in the list head, but they can't both own it, so we have to use mem::replace to steal it away from list head temporarily making that None so that it's not an uninitialized value (dangerous and not allowed by rust compiler).
+            // mem::replace puts the second param into dest (1st param) and returns the replaced value
             next: mem::replace(&mut self.head, None),
         });
         self.head = Some(new_node);
     }
+
+    // Take front element from front of list
     pub fn pop(&mut self) -> Option<i32> {
+        // Same switch around of values as in push() above, have to get head moved out so we can own it before we can set it to the next link in line.
         match mem::replace(&mut self.head, None) {
-            None => None,
+            None => None, // If list head was None (empty) then we just return None.
             Some(node) => {
                 self.head = node.next;
                 Some(node.elem)
@@ -44,6 +49,7 @@ impl List {
     }
 }
 
+// I wasn't paying attention to this bit, todo: go back and read the docs
 impl Drop for List {
     fn drop(&mut self) {
         let mut cur_link = mem::replace(&mut self.head, None);
