@@ -56,7 +56,7 @@ impl Drop for List {
         let mut cur_link = self.head.take();
         // `while let` is clever pattern matching voodoo,
         // it's attempting to assign cur_link to pattern Some(boxed_node), which will set boxed_node if it works, otherwise the while will exit
-        while let Some(mut boxed_node) = cur_link {
+        while let Some(mut _boxed_node) = cur_link {
             // As above, steal the `next` link without leaving next uninitialized.
             cur_link = self.head.take();
             // no need to actually drop inner things (boxed_nde) as they just go out of scope now as nothing else owns them so rust compiler can free them automatically
