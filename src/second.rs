@@ -37,13 +37,10 @@ impl List {
     // Take front element from front of list
     pub fn pop(&mut self) -> Option<i32> {
         // Same switch around of values as in push() above, have to get head moved out so we can own it before we can set it to the next link in line.
-        match self.head.take() {
-            None => None, // If list head was None (empty) then we just return None.
-            Some(node) => {
-                self.head = node.next;
-                Some(node.elem)
-            }
-        }
+        self.head.take().map(|node| {
+            self.head = node.next;
+            node.elem
+        })
     }
 }
 
