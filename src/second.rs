@@ -1,5 +1,3 @@
-use std::mem;
-
 // DIY singly list list https://rust-unofficial.github.io/too-many-lists/
 // Test at end of file.
 
@@ -29,9 +27,9 @@ impl List {
         // Make node from supplied element value.
         let new_node = Box::new(Node {
             elem,
-            // "next" for the new node has to become the same Link as the one currently in the list head, but they can't both own it, so we have to use mem::replace to steal it away from list head temporarily making that None so that it's not an uninitialized value (dangerous and not allowed by rust compiler).
-            // mem::replace puts the second param into dest (1st param) and returns the replaced value
-            next: mem::replace(&mut self.head, None),
+            // "next" for the new node has to become the same Link as the one currently in the list head, but they can't both own it, so we have to use take() to steal it away from list head temporarily making that None so that it's not an uninitialized value (dangerous and not allowed by rust compiler).
+            // take() puts None into the option its called on and returns the replaced value
+            next: self.head.take(),
         });
         self.head = Some(new_node);
     }
@@ -39,7 +37,7 @@ impl List {
     // Take front element from front of list
     pub fn pop(&mut self) -> Option<i32> {
         // Same switch around of values as in push() above, have to get head moved out so we can own it before we can set it to the next link in line.
-        match mem::replace(&mut self.head, None) {
+        match self.head.take() {
             None => None, // If list head was None (empty) then we just return None.
             Some(node) => {
                 self.head = node.next;
@@ -55,12 +53,12 @@ impl List {
 impl Drop for List {
     fn drop(&mut self) {
         // Steal value of head and replace it with None, giving us an owned reference to it in cur_link (which we'll then repeatedly overwrite as we loop).
-        let mut cur_link = mem::replace(&mut self.head, None);
+        let mut cur_link = self.head.take();
         // `while let` is clever pattern matching voodoo,
         // it's attempting to assign cur_link to pattern Some(boxed_node), which will set boxed_node if it works, otherwise the while will exit
         while let Some(mut boxed_node) = cur_link {
             // As above, steal the `next` link without leaving next uninitialized.
-            cur_link = mem::replace(&mut boxed_node.next, None);
+            cur_link = self.head.take();
             // no need to actually drop inner things (boxed_nde) as they just go out of scope now as nothing else owns them so rust compiler can free them automatically
 
             // panic!("oops!") // uncomment this to prove that this is called in the deallocate test
