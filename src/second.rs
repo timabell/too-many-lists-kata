@@ -62,6 +62,8 @@ impl Drop for List {
             // As above, steal the `next` link without leaving next uninitialized.
             cur_link = mem::replace(&mut boxed_node.next, None);
             // no need to actually drop inner things (boxed_nde) as they just go out of scope now as nothing else owns them so rust compiler can free them automatically
+
+            // panic!("oops!") // uncomment this to prove that this is called in the deallocate test
         }
     }
 }
@@ -84,5 +86,12 @@ mod tests {
         assert_eq!(list.pop(), Some(4));
         assert_eq!(list.pop(), Some(1));
         assert_eq!(list.pop(), None);
+    }
+    #[test]
+    fn deallocate() {
+        let mut list = List::new();
+        list.push(42);
+        list.push(33);
+        // run free, list!
     }
 }
