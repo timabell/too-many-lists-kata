@@ -43,6 +43,13 @@ impl<T> List<T> {
             node.elem
         })
     }
+
+    // give me a read-only reference to head without removing it
+    pub fn peek(&self) -> Option<&T> {
+        self.head.as_ref().map(|node| {
+            &node.elem
+        })
+    }
 }
 
 // This is how destructors are done in rust, by implementing the Drop trait.
@@ -96,5 +103,12 @@ mod tests {
         list.push("hi");
         list.push("there");
         let _ = list.pop();
+    }
+    #[test]
+    fn peek(){
+        let mut list = List::new();
+        assert_eq!(list.peek(), None);
+        list.push("hi");
+        assert_eq!(list.peek(), Some(&"hi"));
     }
 }
