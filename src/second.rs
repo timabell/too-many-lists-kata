@@ -36,7 +36,8 @@ impl List {
 
     // Take front element from front of list
     pub fn pop(&mut self) -> Option<i32> {
-        // Same switch around of values as in push() above, have to get head moved out so we can own it before we can set it to the next link in line.
+        // take() is the same switch around of values as in push() above, have to get head moved out so we can own it before we can set it to the next link in line.
+        // map() allows us to apply something to the contents of an Option<x> and get an option with the result https://doc.rust-lang.org/std/option/enum.Option.html#method.map
         self.head.take().map(|node| {
             self.head = node.next;
             node.elem
