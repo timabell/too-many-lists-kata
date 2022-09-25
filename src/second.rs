@@ -4,18 +4,18 @@
 // Contents of a list looks like this, which can go on forever:
 //  list -> head -> link -> option<box<node>> -> node -> elem+list -> head ...
 
-type Link = Option<Box<Node>>;
+type Link<T> = Option<Box<Node<T>>>;
 
-struct Node {
-    elem: i32,
-    next: Link,
+struct Node<T> {
+    elem: T,
+    next: Link<T>,
 }
 
-pub struct List {
-    head: Link,
+pub struct List<T> {
+    head: Link<T>,
 }
 
-impl List {
+impl<T> List<T> {
     fn new() -> Self {
         List { head: None }
     }
@@ -23,7 +23,7 @@ impl List {
     // Add element to the front of the list
     // before: LIST^1 -> head^1 -> link^1 -> some<box<node^1>> -> node^1 -> elem^1 + next^1 -> list^2 -> head^2 ...
     // after:  LIST^1 -> head^1 -> link^1 -> some<box<node^3>> -> node^3 -> elem^3 + next^3 -> list^1 -> head^1 -> link^1 -> some<box<node^1>> ...
-    fn push(&mut self, elem: i32) {
+    fn push(&mut self, elem: T) {
         // Make node from supplied element value.
         let new_node = Box::new(Node {
             elem,
@@ -35,7 +35,7 @@ impl List {
     }
 
     // Take front element from front of list
-    pub fn pop(&mut self) -> Option<i32> {
+    pub fn pop(&mut self) -> Option<T> {
         // take() is the same switch around of values as in push() above, have to get head moved out so we can own it before we can set it to the next link in line.
         // map() allows us to apply something to the contents of an Option<x> and get an option with the result https://doc.rust-lang.org/std/option/enum.Option.html#method.map
         self.head.take().map(|node| {
@@ -48,7 +48,7 @@ impl List {
 // This is how destructors are done in rust, by implementing the Drop trait.
 // https://rust-unofficial.github.io/too-many-lists/first-drop.html
 // We've implemented drop because the default de-allocation of a list would be recursive which could stackoverflow.
-impl Drop for List {
+impl<T> Drop for List<T> {
     fn drop(&mut self) {
         // Steal value of head and replace it with None, giving us an owned reference to it in cur_link (which we'll then repeatedly overwrite as we loop).
         let mut cur_link = self.head.take();
@@ -89,5 +89,12 @@ mod tests {
         list.push(42);
         list.push(33);
         // run free, list!
+    }
+    #[test]
+    fn strings(){
+        let mut list = List::new();
+        list.push("hi");
+        list.push("there");
+        let _ = list.pop();
     }
 }
