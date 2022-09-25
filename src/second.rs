@@ -50,6 +50,12 @@ impl<T> List<T> {
             &node.elem
         })
     }
+    // give me a mutable reference to head without removing it
+    pub fn peek_mut(&mut self) -> Option<&mut T> {
+        self.head.as_mut().map(|node| {
+            &mut node.elem
+        })
+    }
 }
 
 // This is how destructors are done in rust, by implementing the Drop trait.
@@ -109,6 +115,17 @@ mod tests {
         let mut list = List::new();
         assert_eq!(list.peek(), None);
         list.push("hi");
-        assert_eq!(list.peek(), Some(&"hi"));
+        let peek = list.peek();
+        assert_eq!(peek, Some(&"hi"));
+    }
+    #[test]
+    fn peek_mut(){
+        let mut list = List::new();
+        assert_eq!(list.peek_mut(), None);
+        list.push("before");
+        let mut gimme = list.peek_mut();
+        assert_eq!(gimme, Some(&mut "before"));
+        gimme = Some(&mut "after"); // nope
+        assert_eq!(list.peek(), Some(&"after"));
     }
 }
