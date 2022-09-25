@@ -123,9 +123,11 @@ mod tests {
         let mut list = List::new();
         assert_eq!(list.peek_mut(), None);
         list.push("before");
-        let mut gimme = list.peek_mut();
-        assert_eq!(gimme, Some(&mut "before"));
-        gimme = Some(&mut "after"); // nope
+        // peek_mut().map() gets us contents as a `&mut &str` that we can actually de-reference with * and assign to
+        list.peek_mut().map(|contents|{
+            *contents = "after"
+        });
         assert_eq!(list.peek(), Some(&"after"));
+        assert_eq!(list.pop(), Some("after"));
     }
 }
